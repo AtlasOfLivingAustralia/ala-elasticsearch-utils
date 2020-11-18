@@ -1,0 +1,30 @@
+language: java
+cache:
+  directories:
+    - .docker
+    - .autoconf
+    - $HOME/.m2
+services:
+  - docker
+jdk:
+  - openjdk15
+branches:
+  only:
+    - main
+    - develop
+    - /^hotfix\/.*$/
+before_install:
+  - docker-compose -f src/test/docker/elasticsearch-7-standalone.yml up -d
+  - mkdir -p ~/.m2; wget -q -O ~/.m2/settings.xml https://raw.githubusercontent.com/AtlasOfLivingAustralia/travis-build-configuration/master/travis_maven_settings.xml
+  - cd $TRAVIS_BUILD_DIR
+script:
+  - "[ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ] && mvn -P travis clean deploy || mvn -P travis clean install"
+after_success:
+  - mvn clean test jacoco:report
+  - bash <(curl -s https://codecov.io/bash)
+after_script:
+  - docker-compose -f src/test/docker/elasticsearch-7-standalone.yml kill
+env:
+  global:
+    - secure: "GGk0/cGizf0PiubcDV2PI4Xjz9VfByAOkiVmV7FcDTRuZziYO8A4aHKX1NXA9/ajfU3dICqb/Hqw6SJ93ZsFDAuaeTcxWtTgG6Gd0dX/07TH4YhYv/RektgHKaTgKTldpW6EJaSkTfmqwxFyC922gKsMP4NBofAekxSYsawlJmUBy3tPGB8OvoV3x73cZzkgwPARc3ivySbVK5oBVSqcKnSK50kuYJ/bJ71pLqaq4fnnhG1XZqW5qYKJzUBHkh1uQFF7wbD49JT3ddQDt8Y2c+o71KD5LNYMBhGlJ4VOw6mt7JRDJDVpgKYdFwLXS4QbDwbfRuScgbfqfOr1pmNpssMdyO5kUX5JtzIqsxDrszITzmFyc+RXXImDpb2XknGXZrWUOkLdKLXyAydKGYqL+LwwaCFczZd22FDGHjGTh42ggK0SpzN3xvV7CgeKa+ZMcjdPU/a7UDgEHeN+6LtRumDE+VBT4JwkgRXOdxOEH9YpOqH9r59Cv28nCSMvOasad8O3faqywANMBi65UuvdPkVdt11nb+LbZstp1zCOcR5CaUawD5cLsuu70ukkxZAYS84JLtdBY2hf4ZIzGn+/4L8qWzBCYQO3USj2LeWwzmZuTmRSKQ8gZZpCKo1eO2RqBgq1MC+1RUkWGvmClXgsBaW3k/7t/eL4W67JZy7rg0M="
+    - secure: "DWl/0WqbGhNasgW+RLAQoa9j2gtT/M8Jo/SOTO1Gkdgjdz47piE1i2ytIc0TcnnzhaWABDG2v8bU2c5kVxdL0pHdcTcHDgdE6RGMJBjLc5B2GlBLGeLTpKaeW3mpD6b5VQKzVEpxMBpBpdJGjoEvrNY+QtTBDhw0W9ourkmadVL5MbruhoiDU53zZsqiPUJXGL5jWsaVZJOL7KIeaaYDYBdBKsaWYAs4kKziDlEBTsoSrvZtdNWkLa2izaUNOBXLMHVCkYGQhrWMiYwnOeW5X1sd0QGZkNAP+DU6AstOSdCOnX3P1MXkjqRv1y7TidiE49leeWmvwqD2DQp10jQsKy7EBe0lWnK+oNpvfv/IMys01hWcGrfQRkSvqtZ0ZnfnWUrQxhJMc1rpFOMinFf8OIyYngT+RRZG1HZcCd0qseV0rUCpFAIn6an++VTP2SRW8NrJD9jdIOtCfNk8htQi1e60fX87GnV1KHygoBpwdoFfBBdH4vlqopTrKLy4vHOpp7qSAe66vqoKpWWZYdKCeGKgkDtbKInOHYktj7fkWeWxEbkTSTZ+ox6yEW0IM5ArEKx5cIfGws/XysDy+9sUxDU3D+uSsaaeA2alNPySwm+6/2DQT8HKhVNuQjlvG/5Djn4Aqg2e1NUgzh9My4jGYFQY0U2JJxlzAHU5XKfBTk4="

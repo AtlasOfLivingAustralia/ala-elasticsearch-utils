@@ -1,0 +1,42 @@
+{
+  "index_patterns": [
+    "*example-source-index-utils-test*"
+  ],
+  "mappings": {
+    "_meta": {
+      "beat": "filebeat",
+      "version": "7.10.0"
+    },
+    "properties": {
+      "message": {
+        "type": "text"
+      },
+      "postDate": {
+        "type": "text"
+      }
+    }
+  },
+  "order": 1,
+  "settings": {
+    "index": {
+      "lifecycle": {
+        "name": "index-test-1-policy",
+        "rollover_alias": "example-rollover-alias-index-test-1"
+      },
+      "mapping": {
+        "total_fields": {
+          "limit": 100
+        }
+      },
+      "number_of_routing_shards": 2,
+      "number_of_shards": 1,
+      "query": {
+        "default_field": [
+          "message",
+          "postDate"
+        ]
+      },
+      "refresh_interval": "5s"
+    }
+  }
+}

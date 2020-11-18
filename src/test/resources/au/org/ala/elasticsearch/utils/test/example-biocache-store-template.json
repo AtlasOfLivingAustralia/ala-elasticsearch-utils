@@ -1,0 +1,96 @@
+{
+  "index_patterns": [
+    "*filebeat-biocache-store-*"
+  ],
+  "mappings": {
+    "_meta": {
+      "beat": "filebeat",
+      "version": "7.6.2"
+    },
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "agent": {
+        "properties": {
+          "ephemeral_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "hostname": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "type": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "version": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "biocache_store": {
+        "properties": {
+          "statistics": {
+            "properties": {
+              "category": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "entity": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "long_value": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "order": 1,
+  "settings": {
+    "index": {
+      "lifecycle": {
+        "name": "biocache-store-removal-policy",
+        "rollover_alias": "biocache-store-7.6.2"
+      },
+      "mapping": {
+        "total_fields": {
+          "limit": 10000
+        }
+      },
+      "number_of_routing_shards": 30,
+      "number_of_shards": 1,
+      "query": {
+        "default_field": [
+          "message",
+          "tags",
+          "agent.ephemeral_id",
+          "agent.id",
+          "agent.name",
+          "agent.type",
+          "agent.version",
+          "biocache.data_resource.uid"
+        ]
+      },
+      "refresh_interval": "5s"
+    }
+  }
+}
