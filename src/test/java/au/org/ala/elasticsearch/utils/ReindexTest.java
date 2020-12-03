@@ -48,6 +48,7 @@ class ReindexTest extends AbstractAlaElasticsearchUtilsTest {
         final String reindexTaskId = Reindex.asyncReindex(testESClient, testSourceIndex,
                 testDestinationIndex, testReindexScript);
         AlaElasticsearchUtils.waitForTask(testESClient, reindexTaskId);
+        AlaElasticsearchUtils.refresh(testESClient, testSourceIndex, testDestinationIndex);
 
         final Optional<Map<String, Object>> resultDocument = AlaElasticsearchUtils
                 .getDocumentByID(testESClient, testDocumentID, testDestinationIndex);
