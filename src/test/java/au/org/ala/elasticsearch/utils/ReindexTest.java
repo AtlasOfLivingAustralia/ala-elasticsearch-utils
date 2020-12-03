@@ -1,5 +1,14 @@
 package au.org.ala.elasticsearch.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Map;
+import java.util.Optional;
+
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +29,7 @@ class ReindexTest extends AbstractAlaElasticsearchUtilsTest {
      */
     @Test
     final void testReindexDoReindex() throws Exception {
-        Reindex.doReindex(testESClient, testSourceIndex, testDestinationIndex);
+        Reindex.doReindex(testESClient, testSourceIndex, testDestinationIndex, testReindexScript);
     }
 
     /**
@@ -30,8 +39,24 @@ class ReindexTest extends AbstractAlaElasticsearchUtilsTest {
     @Test
     final void testAsyncReindex() throws Exception {
         final String reindexTaskId = Reindex.asyncReindex(testESClient, testSourceIndex,
-                testDestinationIndex);
+                testDestinationIndex, testReindexScript);
         AlaElasticsearchUtils.waitForTask(testESClient, reindexTaskId);
+
+        final SearchResponse searchResponse = AlaElasticsearchUtils.search(testESClient,
+                testDestinationIndex);
+
+        assertFalse(searchResponse.isTimedOut());
+        assertEquals(1, searchResponse.getHits().getTotalHits().value);
+
+        final Optional<Map<String, Object>> resultDocument = AlaElasticsearchUtils
+                .getDocumentByID(testESClient, testDocumentID, testDestinationIndex);
+
+        assertNotNull(resultDocument);
+
+        assertTrue(resultDocument.isPresent());
+
+        assertEquals(1, resultDocument.get().size());
+        assertTrue(resultDocument.get().containsKey("test"));
     }
 
 }

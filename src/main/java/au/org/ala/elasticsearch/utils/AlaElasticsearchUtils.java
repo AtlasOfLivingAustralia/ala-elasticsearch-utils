@@ -21,6 +21,10 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -34,6 +38,9 @@ import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.cluster.health.ClusterIndexHealth;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.tasks.TaskInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -341,5 +348,39 @@ public class AlaElasticsearchUtils {
         return getFieldCapabilities(client, indexNames).entrySet().stream()
                 .filter(entry -> !entry.getKey().startsWith("_"))
                 .collect(Collectors.toUnmodifiableMap(e -> e.getKey(), e -> e.getValue()));
+    }
+
+    public static Optional<Map<String, Object>> getDocumentByID(final RestHighLevelClient client,
+            final String documentID, final String indexName)
+            throws IOException, InterruptedException {
+
+        final GetRequest getRequest = new GetRequest(indexName, documentID);
+        final FetchSourceContext context = FetchSourceContext.FETCH_SOURCE;
+        getRequest.fetchSourceContext(context);
+        final GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
+
+        final String index = getResponse.getIndex();
+        final String id = getResponse.getId();
+
+        final Map<String, Object> sourceDocument = getResponse.getSourceAsMap();
+
+        return Optional.ofNullable(sourceDocument);
+
+    }
+
+    public static SearchResponse search(final RestHighLevelClient client,
+            final String... indexNames) throws IOException, InterruptedException {
+        // SearchRequest searchRequest = new SearchRequest(indexNames);
+        final SearchRequest searchRequest = new SearchRequest();
+        searchRequest.indices(indexNames);
+        searchRequest.indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        // https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.10/java-rest-high-query-builders.html
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchRequest.source(searchSourceBuilder);
+
+        final SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        return searchResponse;
     }
 }

@@ -87,9 +87,8 @@ class AlaElasticsearchTestUtils {
                         createDestinationIndexResponse.isShardsAcknowledged()));
     }
 
-    public static void addSampleDocument(RestHighLevelClient client, String indexName)
-            throws IOException, InterruptedException {
-        final String indexRequestId = "1";
+    public static void addSampleDocument(RestHighLevelClient client, String indexName,
+            String documentID) throws IOException, InterruptedException {
         final String currentDateTime = DateTimeFormatter.ISO_LOCAL_DATE_TIME
                 .format(LocalDateTime.now());
         final String jsonString = "{ \"postDate\": \"" + currentDateTime
@@ -97,14 +96,14 @@ class AlaElasticsearchTestUtils {
         System.out.println(jsonString);
 
         final IndexRequest indexRequest = new IndexRequest(indexName);
-        indexRequest.id(indexRequestId);
+        indexRequest.id(documentID);
         indexRequest.source(jsonString, XContentType.JSON);
 
-        IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-        
+        final IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
+
         System.out.println("indexResponse.getId()=" + indexResponse.getId());
         System.out.println("indexResponse=" + indexResponse);
-        
+
     }
 
 }

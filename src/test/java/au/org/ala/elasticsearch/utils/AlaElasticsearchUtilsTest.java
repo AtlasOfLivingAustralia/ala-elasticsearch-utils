@@ -26,14 +26,14 @@ class AlaElasticsearchUtilsTest extends AbstractAlaElasticsearchUtilsTest {
         final Map<String, Map<String, FieldCapabilities>> destinationFieldCapabilitiesBefore = AlaElasticsearchUtils
                 .getFieldCapabilities(testESClient, testDestinationIndex);
 
-        Assertions.assertEquals(13, destinationFieldCapabilitiesBefore.size());
-        
-        Reindex.doReindex(testESClient, testSourceIndex, testDestinationIndex);
+        Assertions.assertEquals(14, destinationFieldCapabilitiesBefore.size());
+
+        Reindex.doReindex(testESClient, testSourceIndex, testDestinationIndex, testReindexScript);
 
         final Map<String, Map<String, FieldCapabilities>> destinationFieldCapabilitiesAfter = AlaElasticsearchUtils
                 .getFieldCapabilities(testESClient, testDestinationIndex);
 
-        Assertions.assertEquals(13, destinationFieldCapabilitiesAfter.size());
+        Assertions.assertEquals(14, destinationFieldCapabilitiesAfter.size());
 
     }
 
@@ -44,30 +44,50 @@ class AlaElasticsearchUtilsTest extends AbstractAlaElasticsearchUtilsTest {
 
         Assertions.assertEquals(2, sourceFieldCapabilities.size());
         Assertions.assertTrue(sourceFieldCapabilities.containsKey("message"));
-        Assertions.assertEquals("message", sourceFieldCapabilities.get("message").get("text").getName());
-        Assertions.assertEquals("text", sourceFieldCapabilities.get("message").get("text").getType());
+        Assertions.assertEquals("message",
+                sourceFieldCapabilities.get("message").get("text").getName());
+        Assertions.assertEquals("text",
+                sourceFieldCapabilities.get("message").get("text").getType());
         Assertions.assertTrue(sourceFieldCapabilities.containsKey("postDate"));
-        Assertions.assertEquals("postDate", sourceFieldCapabilities.get("postDate").get("text").getName());
-        Assertions.assertEquals("text", sourceFieldCapabilities.get("postDate").get("text").getType());
+        Assertions.assertTrue(sourceFieldCapabilities.get("postDate").containsKey("text"));
+        Assertions.assertEquals("postDate",
+                sourceFieldCapabilities.get("postDate").get("text").getName());
+        Assertions.assertEquals("text",
+                sourceFieldCapabilities.get("postDate").get("text").getType());
 
         final Map<String, Map<String, FieldCapabilities>> destinationFieldCapabilitiesBefore = AlaElasticsearchUtils
                 .getUserDefinedFieldCapabilities(testESClient, testDestinationIndex);
 
-        Assertions.assertEquals(2, destinationFieldCapabilitiesBefore.size());
-        
-        Reindex.doReindex(testESClient, testSourceIndex, testDestinationIndex);
+        Assertions.assertEquals(3, destinationFieldCapabilitiesBefore.size());
+
+        Reindex.doReindex(testESClient, testSourceIndex, testDestinationIndex, testReindexScript);
+        Thread.sleep(1000);
 
         final Map<String, Map<String, FieldCapabilities>> destinationFieldCapabilitiesAfter = AlaElasticsearchUtils
                 .getUserDefinedFieldCapabilities(testESClient, testDestinationIndex);
-        
-        Assertions.assertEquals(2, destinationFieldCapabilitiesAfter.size());
+
+        Assertions.assertEquals(3, destinationFieldCapabilitiesAfter.size());
         Assertions.assertTrue(destinationFieldCapabilitiesAfter.containsKey("message"));
-        Assertions.assertEquals("message", destinationFieldCapabilitiesAfter.get("message").get("text").getName());
-        Assertions.assertEquals("text", destinationFieldCapabilitiesAfter.get("message").get("text").getType());
+        Assertions.assertEquals("message",
+                destinationFieldCapabilitiesAfter.get("message").get("text").getName());
+        Assertions.assertEquals("text",
+                destinationFieldCapabilitiesAfter.get("message").get("text").getType());
+
         Assertions.assertTrue(destinationFieldCapabilitiesAfter.containsKey("postDate"));
-        Assertions.assertEquals("postDate", destinationFieldCapabilitiesAfter.get("postDate").get("date").getName());
-        Assertions.assertEquals("date", destinationFieldCapabilitiesAfter.get("postDate").get("date").getType());
-    
+        Assertions
+                .assertTrue(destinationFieldCapabilitiesAfter.get("postDate").containsKey("date"));
+        Assertions.assertEquals("postDate",
+                destinationFieldCapabilitiesAfter.get("postDate").get("date").getName());
+        Assertions.assertEquals("date",
+                destinationFieldCapabilitiesAfter.get("postDate").get("date").getType());
+
+        Assertions.assertTrue(destinationFieldCapabilitiesAfter.containsKey("postTime"));
+        Assertions
+                .assertTrue(destinationFieldCapabilitiesAfter.get("postTime").containsKey("date"));
+        Assertions.assertEquals("postTime",
+                destinationFieldCapabilitiesAfter.get("postTime").get("date").getName());
+        Assertions.assertEquals("date",
+                destinationFieldCapabilitiesAfter.get("postTime").get("date").getType());
     }
 
 }

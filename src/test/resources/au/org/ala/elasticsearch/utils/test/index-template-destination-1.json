@@ -13,6 +13,9 @@
       },
       "postDate": {
         "type": "date"
+      },
+      "postTime": {
+        "type": "date"
       }
     }
   },
