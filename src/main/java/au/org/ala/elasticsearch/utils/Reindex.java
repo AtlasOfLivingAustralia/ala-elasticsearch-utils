@@ -136,7 +136,7 @@ public class Reindex {
         reindexRequest.setScript(script);
 
         // TODO: Very small fixed sample size while creating the algorithms
-        reindexRequest.setMaxDocs(10);
+        // reindexRequest.setMaxDocs(10);
 
         final TaskSubmissionResponse reindexSubmission = client.submitReindexTask(reindexRequest,
                 RequestOptions.DEFAULT);

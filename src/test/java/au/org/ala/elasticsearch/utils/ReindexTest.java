@@ -38,15 +38,16 @@ class ReindexTest extends AbstractAlaElasticsearchUtilsTest {
      */
     @Test
     final void testAsyncReindex() throws Exception {
+        final Optional<Map<String, Object>> sourceDocument = AlaElasticsearchUtils
+                .getDocumentByID(testESClient, testDocumentID, testSourceIndex);
+
+        assertNotNull(sourceDocument);
+
+        assertTrue(sourceDocument.isPresent());
+
         final String reindexTaskId = Reindex.asyncReindex(testESClient, testSourceIndex,
                 testDestinationIndex, testReindexScript);
         AlaElasticsearchUtils.waitForTask(testESClient, reindexTaskId);
-
-        final SearchResponse searchResponse = AlaElasticsearchUtils.search(testESClient,
-                testDestinationIndex);
-
-        assertFalse(searchResponse.isTimedOut());
-        assertEquals(1, searchResponse.getHits().getTotalHits().value);
 
         final Optional<Map<String, Object>> resultDocument = AlaElasticsearchUtils
                 .getDocumentByID(testESClient, testDocumentID, testDestinationIndex);
@@ -55,8 +56,18 @@ class ReindexTest extends AbstractAlaElasticsearchUtilsTest {
 
         assertTrue(resultDocument.isPresent());
 
-        assertEquals(1, resultDocument.get().size());
-        assertTrue(resultDocument.get().containsKey("test"));
+        assertEquals(3, resultDocument.get().size());
+        assertTrue(resultDocument.get().containsKey("message"));
+        assertTrue(resultDocument.get().containsKey("postDate"));
+        assertTrue(resultDocument.get().containsKey("postTime"));
+
+        final SearchResponse searchResponse = AlaElasticsearchUtils.search(testESClient,
+                testDestinationIndex);
+
+        assertFalse(searchResponse.isTimedOut());
+        assertEquals(1, searchResponse.getHits().getTotalHits().value);
+        assertEquals(testDocumentID, searchResponse.getHits().iterator().next().getId());
+        assertEquals(testDestinationIndex, searchResponse.getHits().iterator().next().getIndex());
     }
 
 }

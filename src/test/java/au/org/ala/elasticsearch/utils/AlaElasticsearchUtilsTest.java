@@ -61,7 +61,7 @@ class AlaElasticsearchUtilsTest extends AbstractAlaElasticsearchUtilsTest {
         Assertions.assertEquals(3, destinationFieldCapabilitiesBefore.size());
 
         Reindex.doReindex(testESClient, testSourceIndex, testDestinationIndex, testReindexScript);
-        Thread.sleep(1000);
+        // Thread.sleep(1000);
 
         final Map<String, Map<String, FieldCapabilities>> destinationFieldCapabilitiesAfter = AlaElasticsearchUtils
                 .getUserDefinedFieldCapabilities(testESClient, testDestinationIndex);

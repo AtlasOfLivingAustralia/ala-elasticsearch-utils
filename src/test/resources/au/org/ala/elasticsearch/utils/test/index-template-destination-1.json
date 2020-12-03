@@ -15,7 +15,8 @@
         "type": "date"
       },
       "postTime": {
-        "type": "date"
+        "type": "date",
+        "format": "HH:mm:ss.SSSSSS"
       }
     }
   },

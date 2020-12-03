@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -87,10 +88,10 @@ class AlaElasticsearchTestUtils {
                         createDestinationIndexResponse.isShardsAcknowledged()));
     }
 
-    public static void addSampleDocument(RestHighLevelClient client, String indexName,
+    public static IndexResponse addSampleDocument(RestHighLevelClient client, String indexName,
             String documentID) throws IOException, InterruptedException {
         final String currentDateTime = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-                .format(LocalDateTime.now());
+                .format(LocalDateTime.now()) + "Z";
         final String jsonString = "{ \"postDate\": \"" + currentDateTime
                 + "\", \"message\": \"Testing reindex process\" }";
         System.out.println(jsonString);
@@ -98,12 +99,15 @@ class AlaElasticsearchTestUtils {
         final IndexRequest indexRequest = new IndexRequest(indexName);
         indexRequest.id(documentID);
         indexRequest.source(jsonString, XContentType.JSON);
+        indexRequest.create(true);
+        indexRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
 
         final IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
 
         System.out.println("indexResponse.getId()=" + indexResponse.getId());
         System.out.println("indexResponse=" + indexResponse);
 
+        return indexResponse;
     }
 
 }

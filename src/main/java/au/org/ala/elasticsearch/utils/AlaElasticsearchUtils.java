@@ -73,6 +73,7 @@ public class AlaElasticsearchUtils {
 
         boolean subTasksRunning = true;
         while (subTasksRunning) {
+            Thread.sleep(100);
             final ListTasksRequest listTasksRequest = new ListTasksRequest();
             listTasksRequest.setDetailed(true);
             final ListTasksResponse listTasksResponse = client.tasks().list(listTasksRequest,
@@ -370,9 +371,9 @@ public class AlaElasticsearchUtils {
 
     public static SearchResponse search(final RestHighLevelClient client,
             final String... indexNames) throws IOException, InterruptedException {
-        // SearchRequest searchRequest = new SearchRequest(indexNames);
-        final SearchRequest searchRequest = new SearchRequest();
-        searchRequest.indices(indexNames);
+        final SearchRequest searchRequest = new SearchRequest(indexNames);
+        // final SearchRequest searchRequest = new SearchRequest();
+        // searchRequest.indices(indexNames);
         searchRequest.indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         // https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.10/java-rest-high-query-builders.html

@@ -12,8 +12,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.IndexTemplateMetadata;
@@ -88,8 +91,10 @@ abstract class AbstractAlaElasticsearchUtilsTest {
         System.out.println("localDate=" + localDate);
         System.out.println("localTime=" + localTime);
 
+        // Debug.explain(ctx._source.postDate);
+        // ctx._source.postTime = DateTimeFormatter.ISO_LOCAL_TIME.format(zdt);
         testReindexScript = new Script(ScriptType.INLINE, "painless",
-                "if (ctx.postDate != '') {ZonedDateTime zdt = ZonedDateTime.parse(ctx.postDate); ctx.postDate = DateTimeFormatter.ISO_LOCAL_DATE.format(zdt); ctx.postTime.DateTimeFormatter.ISO_LOCAL_TIME.format(zdt);}",
+                "if (ctx._source.postDate != '') { ZonedDateTime zdt = ZonedDateTime.parse(ctx._source.postDate); ctx._source.postDate = DateTimeFormatter.ISO_LOCAL_DATE.format(zdt); ctx._source.postTime = DateTimeFormatter.ISO_LOCAL_TIME.format(zdt);}",
                 Collections.emptyMap());
 
         testDocumentID = "1";
@@ -130,7 +135,16 @@ abstract class AbstractAlaElasticsearchUtilsTest {
         AlaElasticsearchTestUtils.deleteAndRecreateIndexes(testESClient, testSourceIndex,
                 testDestinationIndex);
 
-        AlaElasticsearchTestUtils.addSampleDocument(testESClient, testSourceIndex, testDocumentID);
+        final IndexResponse sampleDocumentResponse = AlaElasticsearchTestUtils
+                .addSampleDocument(testESClient, testSourceIndex, testDocumentID);
+
+        assertEquals(DocWriteResponse.Result.CREATED, sampleDocumentResponse.getResult());
+        assertEquals(testSourceIndex, sampleDocumentResponse.getIndex());
+        assertEquals(testDocumentID, sampleDocumentResponse.getId());
+
+        final Optional<Map<String, Object>> sourceDocument = AlaElasticsearchUtils
+                .getDocumentByID(testESClient, testDocumentID, testSourceIndex);
+        assertTrue(sourceDocument.isPresent());
 
         // Thread.sleep(10000);
 
@@ -155,6 +169,12 @@ abstract class AbstractAlaElasticsearchUtilsTest {
 
         final SearchResponse searchResponse = AlaElasticsearchUtils.search(testESClient,
                 testSourceIndex);
+        // final SearchResponse searchResponse =
+        // AlaElasticsearchUtils.search(testESClient,
+        // "example-*");
+        // final SearchResponse searchResponse =
+        // AlaElasticsearchUtils.search(testESClient,
+        // testDestinationIndex);
 
         assertFalse(searchResponse.isTimedOut());
         assertTrue(searchResponse.getHits().getTotalHits().value > 0);
