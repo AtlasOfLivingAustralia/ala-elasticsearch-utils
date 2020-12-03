@@ -103,6 +103,8 @@ public class Reindex {
         final String taskId = Reindex.asyncReindex(client, sourceIndex, destinationIndex, script);
 
         AlaElasticsearchUtils.waitForTask(client, taskId);
+
+        AlaElasticsearchUtils.refresh(client, sourceIndex, destinationIndex);
     }
 
     /**

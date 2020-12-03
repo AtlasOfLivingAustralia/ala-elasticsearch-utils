@@ -18,6 +18,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksRequest;
 import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
@@ -383,5 +384,13 @@ public class AlaElasticsearchUtils {
 
         final SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         return searchResponse;
+    }
+
+    public static void refresh(final RestHighLevelClient client, final String... indexNames)
+            throws IOException, InterruptedException {
+        final RefreshRequest refreshRequest = new RefreshRequest(indexNames);
+        refreshRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
+
+        client.indices().refresh(refreshRequest, RequestOptions.DEFAULT);
     }
 }
