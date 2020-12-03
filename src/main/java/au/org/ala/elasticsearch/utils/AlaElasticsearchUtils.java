@@ -199,7 +199,7 @@ public class AlaElasticsearchUtils {
 
         for (int retries = 0; retries <= maxRetries; retries++) {
             final ClusterHealthRequest request = new ClusterHealthRequest(indexNames);
-            request.waitForStatus(ClusterHealthStatus.YELLOW);
+            request.waitForStatus(ClusterHealthStatus.GREEN);
             request.level(ClusterHealthRequest.Level.INDICES);
             // request.waitForActiveShards(ActiveShardCount.ALL);
             // request.timeout(TimeValue.timeValueSeconds(20));

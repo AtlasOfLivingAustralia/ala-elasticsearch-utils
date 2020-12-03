@@ -52,7 +52,7 @@ class AlaElasticsearchTestUtils {
         final CreateIndexRequest createSourceRequest = new CreateIndexRequest(sourceIndex);
 
         createSourceRequest.settings(Settings.builder().put("index.number_of_shards", 1)
-                .put("index.number_of_replicas", 1));
+                .put("index.number_of_replicas", 0));
 
         // createSourceRequest.mapping(
         // "{\"properties\": { \"message\": { \"type\": \"text\" },
@@ -72,7 +72,7 @@ class AlaElasticsearchTestUtils {
                 destinationIndex);
 
         createDestinationRequest.settings(Settings.builder().put("index.number_of_shards", 1)
-                .put("index.number_of_replicas", 1));
+                .put("index.number_of_replicas", 0));
 
         // Example: Change the postDate type to date
         // createDestinationRequest.mapping(
