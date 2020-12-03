@@ -32,7 +32,7 @@
           "limit": 100
         }
       },
-      "number_of_routing_shards": 2,
+      "number_of_routing_shards": 1,
       "number_of_shards": 1,
       "query": {
         "default_field": [
