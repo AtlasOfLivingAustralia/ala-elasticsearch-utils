@@ -1,7 +1,8 @@
 # ala-elasticsearch-utils
+
 Elasticsearch utilities
 
-ala-elasticsearch-utils [![Build Status](https://travis-ci.com/AtlasOfLivingAustralia/ala-elasticsearch-utils.svg?branch=master)](http://travis-ci.com/AtlasOfLivingAustralia/ala-elasticsearch-utils) [![Coverage Status](https://coveralls.io/repos/github/AtlasOfLivingAustralia/ala-elasticsearch-utils/badge.svg)](https://coveralls.io/github/AtlasOfLivingAustralia/ala-elasticsearch-utils)
+ala-elasticsearch-utils [![Build Status](https://travis-ci.com/AtlasOfLivingAustralia/ala-elasticsearch-utils.svg?branch=master)](https://travis-ci.com/AtlasOfLivingAustralia/ala-elasticsearch-utils) [![codecov](https://codecov.io/gh/AtlasOfLivingAustralia/ala-elasticsearch-utils/branch/main/graph/badge.svg?token=DSVGC6T0RP)](https://codecov.io/gh/AtlasOfLivingAustralia/ala-elasticsearch-utils)
 
 # Testing dependencies
 
