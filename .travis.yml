@@ -1,7 +1,6 @@
 language: java
 cache:
   directories:
-    - .docker
     - .autoconf
     - $HOME/.m2
 services:
